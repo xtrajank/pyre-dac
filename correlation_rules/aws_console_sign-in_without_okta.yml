@@ -1,0 +1,50 @@
+AnalysisType: correlation_rule
+RuleID: "AWS.Console.Sign-In.WITHOUT.Okta"
+DisplayName: "AWS Console Sign-In WITHOUT Okta Redirect"
+Enabled: false
+Tags:
+    - AWS
+    - Configuration Required
+    - Okta
+    - Actor Profiles
+Severity: High
+Description: A user has logged into the AWS console without authenticating via Okta.  This rule requires AWS SSO via Okta and both log sources configured.
+Detection:
+    - Group:
+        - ID: Okta SSO to AWS
+          RuleID: Okta.SSO.to.AWS
+          Absence: true
+        - ID: AWS Console Sign-In
+          RuleID: AWS.Console.Sign-In
+      MatchCriteria:
+        field_name:
+          - GroupID: Okta SSO to AWS
+            Match: p_alert_context.actor
+          - GroupID: AWS Console Sign-In
+            Match: userIdentity.userName
+      Schedule:
+        RateMinutes: 1440
+        TimeoutMinutes: 5
+      LookbackWindowMinutes: 1800
+Tests:
+  - Name: AWS Console Sign-In PRECEDED BY Okta Redirect
+    ExpectedResult: false
+    RuleOutputs:
+    - ID: Okta SSO to AWS
+      Matches:
+        p_alert_context.actor:
+          igor.stravinsky:
+            - 0
+    - ID: AWS Console Sign-In
+      Matches:
+        userIdentity.userName:
+          igor.stravinsky:
+            - 2
+  - Name: AWS Console Sign-In NOT PRECEDED BY Okta Redirect
+    ExpectedResult: true
+    RuleOutputs:
+    - ID: AWS Console Sign-In
+      Matches:
+        userIdentity.userName:
+          igor.stravinsky:
+            - 2

@@ -1,0 +1,23 @@
+QUERIES = {"pack_incident-response_alf", "pack/mac-cis/ApplicationFirewall"}
+
+
+def rule(event):
+    if event.get("name") not in QUERIES:
+        return False
+
+    if event.get("action") != "added":
+        return False
+
+    return (
+        # 0 If the firewall is disabled
+        # 1 If the firewall is enabled with exceptions
+        # 2 If the firewall is configured to block all incoming connections
+        int(event.deep_get("columns", "global_state")) == 0
+        or
+        # Stealth mode is a best practice to avoid responding to unsolicited probes
+        int(event.deep_get("columns", "stealth_enabled")) == 0
+    )
+
+
+def title(event):
+    return f"MacOS firewall disabled on [{event.get('hostIdentifier')}]"

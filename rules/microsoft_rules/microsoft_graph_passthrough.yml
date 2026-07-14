@@ -1,0 +1,87 @@
+AnalysisType: rule
+Description: The Microsoft Graph security API federates queries to all onboarded security providers, including Azure AD Identity Protection, Microsoft 365, Microsoft Defender (Cloud, Endpoint, Identity) and Microsoft Sentinel
+Reference: https://learn.microsoft.com/en-us/graph/api/resources/security-alert?view=graph-rest-1.0
+DisplayName: "Microsoft Graph Passthrough"
+Enabled: true
+Filename: microsoft_graph_passthrough.py
+Severity: Medium
+Tests:
+  - ExpectedResult: true
+    Log:
+      tenantId: 12345-abcde-a1b2k3
+      id: abcd12345efghijk6789
+      title: Anonymous IP address
+      description: Sign-in from an anonymous IP address (e.g. Tor browser, anonymizer VPNs)
+      category: AnonymousLogin
+      createdDateTime: "2026-04-01T14:31:48.438Z"
+      firstActivityDateTime: "2026-04-01T14:31:48.438Z"
+      lastActivityDateTime: "2026-04-01T14:31:48.438Z"
+      lastUpdateDateTime: "2026-04-01T14:34:56.229Z"
+      severity: medium
+      status: new
+      serviceSource: microsoftDefenderForIdentity
+      productName: Microsoft Defender for Identity
+      evidence:
+        - at_sign_odata_type: "#microsoft.graph.security.userEvidence"
+          userAccount:
+            accountName: homer.simpson
+            domainName: corporation.onmicrosoft.com
+            userPrincipalName: homer.simpson@corporation.onmicrosoft.com
+            azureAdUserId: 011d5ede-0faa-4946-a25e-b2cd0c47a52c
+        - at_sign_odata_type: "#microsoft.graph.security.ipEvidence"
+          ipAddress: 185.220.103.6
+          countryLetterCode: US
+    Name: Anonymous Login Event (v2)
+  - ExpectedResult: true
+    Log:
+      tenantId: abcdef-123456-ghijklmn
+      id: abcdefg-123456-hijklmno
+      title: Password Spray
+      description: Password spray attack detected
+      category: PasswordSpray
+      createdDateTime: "2026-04-02T09:28:04.767Z"
+      firstActivityDateTime: "2026-04-02T14:22:00.698Z"
+      lastUpdateDateTime: "2026-04-02T14:30:21.979Z"
+      severity: high
+      status: new
+      serviceSource: microsoftDefenderForIdentity
+      evidence:
+        - at_sign_odata_type: "#microsoft.graph.security.userEvidence"
+          userAccount:
+            accountName: homer.simpson
+            domainName: corporation.onmicrosoft.com
+            userPrincipalName: homer.simpson@corporation.onmicrosoft.com
+    Name: Password Spray Event (v2)
+  - ExpectedResult: false
+    Log:
+      tenantId: abcdefg-12345
+      id: abcdefg12345hijklmnop
+      title: Anonymous IP address
+      description: Sign-in from an anonymous IP address (e.g. Tor browser, anonymizer VPNs)
+      category: AnonymousLogin
+      createdDateTime: "2026-04-03T19:54:13.725Z"
+      firstActivityDateTime: "2026-04-03T19:54:13.725Z"
+      lastUpdateDateTime: "2026-04-03T19:56:57.833Z"
+      severity: high
+      status: resolved
+      serviceSource: microsoftDefenderForIdentity
+    Name: Resolved Event (v2)
+  - ExpectedResult: false
+    Log:
+      tenantId: abcdefg-12345
+      id: info-event-1
+      title: Informational signal
+      description: Low-noise informational alert
+      category: Informational
+      createdDateTime: "2026-04-04T10:00:00.000Z"
+      firstActivityDateTime: "2026-04-04T10:00:00.000Z"
+      lastUpdateDateTime: "2026-04-04T10:00:00.000Z"
+      severity: informational
+      status: new
+      serviceSource: microsoftDefenderForCloud
+    Name: Informational Severity Event (v2)
+DedupPeriodMinutes: 60
+LogTypes:
+  - MicrosoftGraph.SecurityAlertV2
+RuleID: "Microsoft.Graph.Passthrough"
+Threshold: 1

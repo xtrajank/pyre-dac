@@ -1,0 +1,67 @@
+AnalysisType: correlation_rule
+RuleID: "OneLogin.HighRiskFailedLogin.WITH.SuccessfulLogin"
+DisplayName: "OneLogin High Risk Failed Login WITH Successful Login"
+Enabled: false
+Severity: Medium
+Description: A OneLogin user successfully logged in after a failed high-risk login attempt.
+Reference: https://resources.onelogin.com/OneLogin_RiskBasedAuthentication-WP-v5.pdf
+Runbook: Investigate whether this was caused by expected user activity.
+Reports:
+  MITRE ATT&CK:
+    - TA0001:T1078  # Valid Accounts
+Detection:
+    - Group:
+        - ID: HighRiskFailedLogin
+          RuleID: OneLogin.HighRiskFailedLogin
+        - ID: SuccessfulLogin
+          RuleID: OneLogin.Login
+      MatchCriteria:
+        field_name:
+          - GroupID: HighRiskFailedLogin
+            Match: user_name
+          - GroupID: SuccessfulLogin
+            Match: user_name
+      LookbackWindowMinutes: 1800
+      Schedule:
+        RateMinutes: 1440
+        TimeoutMinutes: 5
+Tests:
+    - Name: High Risk Failed Login FOLLOWED BY Successful Login within short time
+      ExpectedResult: true
+      RuleOutputs:
+        - ID: HighRiskFailedLogin
+          Matches:
+            user_name:
+              'Some_user':
+                - "2024-06-01T10:00:01Z"
+        - ID: SuccessfulLogin
+          Matches:
+            user_name:
+              'Some_user':
+                - "2024-06-01T10:01:01Z"
+    - Name: High Risk Failed Login FOLLOWED BY Successful Login not within short time
+      ExpectedResult: false
+      RuleOutputs:
+        - ID: HighRiskFailedLogin
+          Matches:
+            user_name:
+              'Some_user':
+                - "2024-06-01T10:00:01Z"
+        - ID: SuccessfulLogin
+          Matches:
+            user_name:
+              'Some_user':
+                - "2024-06-03T10:01:01Z"
+    - Name: High Risk Failed Login FOLLOWED BY Successful Login of other user
+      ExpectedResult: false
+      RuleOutputs:
+        - ID: HighRiskFailedLogin
+          Matches:
+            user_name:
+              'Some_user':
+                - "2024-06-01T10:00:01Z"
+        - ID: SuccessfulLogin
+          Matches:
+            user_name:
+              'Some_other_user':
+                - "2024-06-01T10:01:01Z"
