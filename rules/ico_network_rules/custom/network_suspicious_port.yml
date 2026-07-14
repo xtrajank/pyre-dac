@@ -1,0 +1,38 @@
+AnalysisType: rule
+Filename: network_suspicious_port.py
+RuleID: network.suspicious.port
+DisplayName: "Network Connection to Suspicious Port"
+Enabled: true
+LogTypes:
+  - ICO.Network
+Tags:
+  - Network
+Severity: Medium
+---
+Threshold: 1
+DedupPeriodMinutes: 15
+SummaryAttributes:
+  - remote_ip
+  - remote_port
+  - process_name
+Tests:
+  - Name: Connection to port 4444
+    ExpectedResult: true
+    Log:
+      {
+        "p_log_type": "ICO.Network",
+        "remote_ip": "203.0.113.9",
+        "remote_port": 4444,
+        "process_name": "nc",
+        "hostname": "test-host"
+      }
+  - Name: Normal HTTPS connection
+    ExpectedResult: false
+    Log:
+      {
+        "p_log_type": "ICO.Network",
+        "remote_ip": "142.250.72.14",
+        "remote_port": 443,
+        "process_name": "chrome",
+        "hostname": "test-host"
+      }
