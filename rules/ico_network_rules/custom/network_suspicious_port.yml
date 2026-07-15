@@ -8,7 +8,6 @@ LogTypes:
 Tags:
   - Network
 Severity: Medium
----
 Threshold: 1
 DedupPeriodMinutes: 15
 SummaryAttributes:
