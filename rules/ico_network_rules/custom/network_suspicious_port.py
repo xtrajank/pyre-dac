@@ -9,6 +9,9 @@ def title(event):
         event.get("hostname", "unknown host")
     )
 
+def dedup(event):
+    return event.get("remote_ip")
+
 
 def severity(event):
     return "Medium"
